@@ -2,7 +2,7 @@
 
 ## How To Setup Telegram bot
 
-Before create the bot, You need a Mysql or MariaDB database server Running. And make sure your database can connect from outside of the Server. Also, get your telegram bot Token from [BotFather](https://t.me/botfather)
+Before create the bot, You need a Mysql or MariaDB database server Running. And make sure your database can connect from outside of the Server. Also, get your telegram bot Token from [BotFather](https://t.me/botfather).
 
 ### Docker
 
