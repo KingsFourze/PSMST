@@ -30,4 +30,4 @@ Go to the [psmst Docker Page](https://hub.docker.com/r/kingsfourze/psmst)
 4. Input the database config and Token to tell your app how can it communicate to your database.
 5. Press the save button.
 
-If you need to edit the config you need to press the stop button and press start button again for saving config.
+If you need to edit the config, you need to press the stop button and press start button again for saving config.
