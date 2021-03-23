@@ -1,8 +1,8 @@
 # Phone SMS Transfer
 
-## How To Create bot
+## How To Setup Telegram bot
 
-- First, You need a Mysql or MariaDB database server Running. And make sure your database can connect from outside of the Server.
+Before create the bot, You need a Mysql or MariaDB database server Running. And make sure your database can connect from outside of the Server. Also, get your telegram bot Token from [BotFather](https://t.me/botfather)
 
 ### Docker
 
