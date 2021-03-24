@@ -1,18 +1,6 @@
 from telegram.ext import Updater, CommandHandler, CallbackContext
 import random, time, pymysql, threading, sys
 
-def holdSQL():
-    while True:
-        cursor.execute("SELECT VERSION()")
-        time.sleep(60)
-
-def WaitingLock():
-    global sqlLock
-    while sqlLock:
-        time.sleep(0.01)
-    sqlLock = 1
-    return 0
-
 def messageTransfer():
     mTdb = pymysql.connect(host=sys.argv[1],user=sys.argv[2],password=sys.argv[3],database=sys.argv[4])
     mTcurcor = mTdb.cursor()
@@ -28,7 +16,7 @@ def messageTransfer():
         time.sleep(5)
 
 
-def randomGenToken():
+def randomGenToken(cursor):
     while True:
         token = ""
         random_str_seq = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -44,26 +32,25 @@ def helpMessage(update, context):
     update.message.reply_text("=======  HELP  MENU  =======\n/getToken : Get Your Token.\n/delToken : Delete Your Token.")
 
 def getToken(update, context):
+    db = pymysql.connect(host=sys.argv[1],user=sys.argv[2],password=sys.argv[3],database=sys.argv[4])
+    cursor = db.cursor()
     if cursor.execute("SELECT userToken FROM userdata WHERE chatID = " + str(update.message.chat.id)) > 0:
         data = cursor.fetchone()[0]
     else:
-        data = randomGenToken()
+        data = randomGenToken(cursor)
         cursor.execute("INSERT INTO userdata (chatID, userToken) VALUES ("+ str(update.message.chat.id)+", '"+ data +"')")
         db.commit()
+    db.close()
     update.message.reply_text("Your Token is: " + data)
 
 def delToken(update, context):
+    db = pymysql.connect(host=sys.argv[1],user=sys.argv[2],password=sys.argv[3],database=sys.argv[4])
+    cursor = db.cursor()
     cursor.execute("DELETE FROM userdata WHERE chatID = " + str(update.message.chat.id))
     db.commit()
+    db.close()
     update.message.reply_text("Your Token has deleted")
 
-def hello(update, context):
-    global targetID
-    targetID = update.message.chat.id
-    print("chatID:",update.message.chat.id,", say hello!")
-    print(type(update.message.chat.id))
-    context.bot.send_message(chat_id = update.message.chat.id, text="hello, {0}. Your ChatID is {1}".format(update.message.from_user.first_name, update.message.chat.id))
-    
 def setupDatabase():
     db = pymysql.connect(host=sys.argv[1],user=sys.argv[2],password=sys.argv[3])
     cursor = db.cursor()
@@ -75,12 +62,6 @@ def setupDatabase():
     
 def main():
     setupDatabase()
-
-    global db, cursor
-    #Setup MySQL Client
-    db = pymysql.connect(host=sys.argv[1],user=sys.argv[2],password=sys.argv[3],database=sys.argv[4])
-    cursor = db.cursor()
-    threading.Thread(target=holdSQL).start()
 
     global updater
     #Setup Telegram Bot Listener
