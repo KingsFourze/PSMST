@@ -1,8 +1,6 @@
-FROM ubuntu:latest
+FROM alpine:latest
 MAINTAINER KingsFourze
-RUN sed -i "s/archive.ubuntu.com/ftp.ubuntu-tw.org/g" /etc/apt/sources.list
-RUN apt update 
-RUN apt install python3 python3-pip -y
+RUN apk add python3 py3-pip
 RUN python3 -m pip install python-telegram-bot pymysql
 ENV DBHOST=localhost
 ENV DBUSER=root
@@ -13,4 +11,4 @@ WORKDIR /app
 COPY ./telegram_bot.py .
 COPY ./startbot.sh .
 RUN chmod 700 startbot.sh
-CMD ["bash","startbot.sh"]
+CMD ["sh","startbot.sh"]
