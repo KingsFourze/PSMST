@@ -1,9 +1,15 @@
 package nz.ac.kingsfourze.smstransfer;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -11,17 +17,34 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     public EditText editToken, editHost, editPort, editUser, editPassword, editDBname;
-    public Button btnStart, btnStop;
+    public Button btnStart, btnStop, btnSave;
     public Spinner spinnerDatabaseType;
     public String[] dbType = {"MariaDB","MySQL"};
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == 1) {
+            if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                Toast.makeText(getApplicationContext(),"未提供SMS接收權限，請開啟後再使用本App", Toast.LENGTH_SHORT).show();
+                finish();
+            } else
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Get Permission
+        if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(MainActivity.this, new String[] { Manifest.permission.RECEIVE_SMS }, 1);
+        }
 
         SharedPreferences setting = getSharedPreferences("Setting", MODE_PRIVATE);
         setupUI();
@@ -30,20 +53,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 int position = spinnerDatabaseType.getSelectedItemPosition();
-                if (editPort.getText().toString().equals("")){
-                    editPort.setText("3306", TextView.BufferType.EDITABLE);
-                }
-                setting.edit()
-                        .putString("host", editHost.getText().toString())
-                        .putString("port",editPort.getText().toString())
-                        .putString("user", editUser.getText().toString())
-                        .putString("password", editPassword.getText().toString())
-                        .putString("dbName", editDBname.getText().toString())
-                        .putString("userToken", editToken.getText().toString())
-                        .putBoolean("runStatus", true)
-                        .putInt("dbType", position).commit();
+                saveSetting(setting,true);
                 btnStart.setVisibility(View.INVISIBLE);
                 btnStop.setVisibility(View.VISIBLE);
+            }
+        });
+
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveSetting(setting,false);
             }
         });
 
@@ -57,6 +76,24 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void saveSetting(SharedPreferences setting, Boolean withRunStatus){
+        int position = spinnerDatabaseType.getSelectedItemPosition();
+        if (editPort.getText().toString() == ""){
+            editPort.setText("3306", TextView.BufferType.EDITABLE);
+        }
+        setting.edit()
+                .putString("host", editHost.getText().toString())
+                .putString("port",editPort.getText().toString())
+                .putString("user", editUser.getText().toString())
+                .putString("password", editPassword.getText().toString())
+                .putString("dbName", editDBname.getText().toString())
+                .putString("userToken", editToken.getText().toString())
+                .putInt("dbType", position).commit();
+        if (withRunStatus){
+            setting.edit().putBoolean("runStatus", true).commit();
+        }
+    }
+
     private void setupUI(){
         //Setup View
         editToken = findViewById(R.id.editToken);
@@ -67,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
         editDBname = findViewById(R.id.editDBname);
         btnStart = findViewById(R.id.btnStart);
         btnStop = findViewById(R.id.btnStop);
+        btnSave = findViewById(R.id.btnSave);
         spinnerDatabaseType = findViewById(R.id.spinnerDataBaseType);
 
         //Spinner Setup

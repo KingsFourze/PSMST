@@ -69,12 +69,12 @@ public class SMSReceiver extends BroadcastReceiver {
         user = setting.getString("user","root");
         password = setting.getString("password","PSMSTPassword");
         userToken = setting.getString("userToken","");
-
         url = "jdbc:"+ dbtype +"://" + host + ":" + port + "/" + dbname + "?user="+ user + "&password=" + password;
-        if (runStatus == false)
+
+        if (runStatus == false || userToken == "")
             return;
 
-        if (intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED")){
+        if (intent.getAction() == "android.provider.Telephony.SMS_RECEIVED"){
             Bundle bundle = intent.getExtras();
             SmsMessage[] messages = null;
             String strMessage = "";
