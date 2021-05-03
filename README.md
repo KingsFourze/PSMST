@@ -34,6 +34,6 @@ Go to the [psmst Docker Page](https://hub.docker.com/r/kingsfourze/psmst)
 2. Get your token from telegram bot using /getToken command
 3. Open the app
 4. Input the database config and Token to tell your app how can it communicate to your database.
-5. Press the save button.
+5. Press the start button.
 
-If you need to edit the config, you need to press the stop button and press start button again for saving config.
+If you need to edit the config, you can press save button for saving config after version 1.1. But before version 1.1, you need to press stop button and press start button for saving.
